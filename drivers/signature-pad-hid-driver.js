@@ -82,12 +82,12 @@ export class SignaturePadHIDDriver extends BaseDriver {
 
     this.keepReading = true;
 
-    device.addEventListener("inputreport", (event) => {
+    this.port.addEventListener("inputreport", (event) => {
       console.log(event.data);
-      // if (this.keepReading) {
-      //   let data = new Uint8Array(event.data.buffer);
-      //   this.process(data, new Date().getTime());
-      // }
+      if (this.keepReading) {
+        let data = new Uint8Array(event.data.buffer);
+        this.process(data, new Date().getTime());
+      }
     });
 
     // reset bytes array after 0.05s, it clear any old bytes were stuck in the buffer
