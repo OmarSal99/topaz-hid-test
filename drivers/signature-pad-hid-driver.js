@@ -79,14 +79,17 @@ export class SignaturePadHIDDriver extends BaseDriver {
 
     // open a connection with that device
     await this.port.open();
-
     this.keepReading = true;
+
+    // setTimeout(() => {
+    //   console.log(new Uint8Array(decimalNumbersArray));
+    //   this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
+    // }, 3000);
 
     this.port.addEventListener("inputreport", (event) => {
       if (this.keepReading) {
         let data = new Uint8Array(event.data.buffer);
-        console.log(data.toString());
-        // this.process(data, new Date().getTime());
+        this.process(data, new Date().getTime());
       }
     });
 
@@ -114,12 +117,16 @@ export class SignaturePadHIDDriver extends BaseDriver {
 
     this.bytesArray.push(...data);
 
-    // while the bytesArray have over 5 elements (chunk size is 5) it keep processing data in it
+    // while the bytesArray have over 6 elements (chunk size is 6) it keep processing data in it
     while (this.bytesArray.length >= this.chunkSize) {
       let decodedObj = null;
       decodedObj = this.decodeFunction(
         this.bytesArray.slice(0, this.chunkSize)
       );
+      if ("ignore" in decodedObj && decodedObj.ignore === true) {
+        this.bytesArray.splice(0, this.chunkSize);
+        continue;
+      }
       if ("invalid" in decodedObj && decodedObj.invalid === true) {
         this.lastX = null;
         this.lastY = null;
@@ -128,6 +135,7 @@ export class SignaturePadHIDDriver extends BaseDriver {
       }
       let x = decodedObj.x;
       let y = decodedObj.y;
+      console.log(x, y);
       // remove the decoded bytes from the array
       this.bytesArray.splice(0, this.chunkSize);
       if (drawLine === true && this.lastX !== null && this.lastY !== null) {

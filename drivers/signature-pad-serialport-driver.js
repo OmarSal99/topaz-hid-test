@@ -67,7 +67,7 @@ export class SignaturePadSerialDriver extends BaseDriver {
       parity: "odd",
       chunkSize: 5,
       decodeFunction: _decodeFunction,
-      callbackFunction: ()=>{},
+      callbackFunction: () => {},
     };
 
     options = { ...defaultOptions, ...options };
@@ -97,7 +97,7 @@ export class SignaturePadSerialDriver extends BaseDriver {
               break;
             }
             // call process and give data and the current time
-            console.log(value)
+            console.log(value);
             this.process(value, new Date().getTime());
           }
         } catch (error) {
@@ -148,6 +148,7 @@ export class SignaturePadSerialDriver extends BaseDriver {
       }
       let x = decodedObj.x;
       let y = decodedObj.y;
+      console.log(x, y);
       // remove the decoded bytes from the array
       this.bytesArray.splice(0, this.chunkSize);
       if (drawLine === true && this.lastX !== null && this.lastY !== null) {
