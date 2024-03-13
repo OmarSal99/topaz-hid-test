@@ -97,7 +97,7 @@ export class SignaturePadSerialDriver extends BaseDriver {
               break;
             }
             // call process and give data and the current time
-            console.log(value);
+            console.log(value.toString());
             this.process(value, new Date().getTime());
           }
         } catch (error) {

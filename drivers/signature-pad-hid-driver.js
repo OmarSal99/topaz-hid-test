@@ -89,6 +89,7 @@ export class SignaturePadHIDDriver extends BaseDriver {
     this.port.addEventListener("inputreport", (event) => {
       if (this.keepReading) {
         let data = new Uint8Array(event.data.buffer);
+        console.log(data.toString());
         this.process(data, new Date().getTime());
       }
     });
