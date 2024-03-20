@@ -1,4 +1,5 @@
 import { BaseDriver } from "./base-driver.js";
+// import { testData } from "./testData.js";
 
 export class SignaturePadHIDDriver extends BaseDriver {
   constructor() {
@@ -82,9 +83,12 @@ export class SignaturePadHIDDriver extends BaseDriver {
     this.keepReading = true;
 
     // setTimeout(() => {
+    //   let decimalNumbersArray = testData.trim().split(/\n|,/);
+    //   // const decimalNumbersArray = lines.map((line) => [...line.trim().split(",")]);
+    //   decimalNumbersArray = decimalNumbersArray.map((str) => +str);
     //   console.log(new Uint8Array(decimalNumbersArray));
     //   this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
-    // }, 3000);
+    // }, 2000);
 
     this.port.addEventListener("inputreport", (event) => {
       if (this.keepReading) {
@@ -117,7 +121,6 @@ export class SignaturePadHIDDriver extends BaseDriver {
       drawLine = true;
 
     this.bytesArray.push(...data);
-
     // while the bytesArray have over 6 elements (chunk size is 6) it keep processing data in it
     while (this.bytesArray.length >= this.chunkSize) {
       let decodedObj = null;

@@ -102,13 +102,20 @@ export const signaturePadView = (function () {
   }
 
   function updateCanvasSize(canvasWidth, canvasHeight) {
-    let height = Math.ceil(
-      Math.max(canvasWidth / canvasCssWidthToHeightRatio, canvasHeight)
-    );
+    let maxWidth = 512;
+    let maxHeight = 256;
+    // let height = Math.ceil(
+    //   Math.max(canvasWidth / canvasCssWidthToHeightRatio, canvasHeight)
+    // );
 
     let canvas = document.getElementById(canvasId);
-    canvas.height = height;
-    canvas.width = Math.ceil(height * canvasCssWidthToHeightRatio);
+    // canvas.height = canvasHeight;
+    // canvas.width = Math.ceil(height * canvasCssWidthToHeightRatio);
+    canvas.height = canvasHeight;
+    canvas.width = canvasWidth;
+    let ratio = Math.max(canvasWidth / maxWidth, canvasHeight / maxHeight);
+    canvas.style.width = Math.ceil(canvasWidth / ratio) + "px";
+    canvas.style.height = Math.ceil(canvasHeight / ratio) + "px";
   }
 
   function enableDisconnectButton() {
