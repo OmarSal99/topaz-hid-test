@@ -3,6 +3,7 @@ import { SignaturePadSerialDriver } from "../drivers//signature-pad-serialport-d
 import { SignaturePadHIDDriver } from "../drivers/signature-pad-hid-driver.js";
 import { BaseController } from "../controllers/base-controller.js";
 import { profiles } from "./profiles/profile-list.js";
+import { SignaturePadUSBDriver } from "../drivers/signature-pad-usb-driver.js";
 
 export class SignaturePadController extends BaseController {
   static instance;
@@ -52,10 +53,26 @@ export class SignaturePadController extends BaseController {
     console.log(interfaceType);
     let connectInner = signaturePadView.connect("connecting ...");
 
-    this.signaturePadDriver =
-      interfaceType === "SERIALPORT"
-        ? new SignaturePadSerialDriver(this.drawOnCanvas)
-        : new SignaturePadHIDDriver(this.drawOnCanvas);
+    switch (interfaceType) {
+      case "SERIALPORT":
+        this.signaturePadDriver = new SignaturePadSerialDriver(
+          this.drawOnCanvas
+        );
+        break;
+      case "HID":
+        this.signaturePadDriver = new SignaturePadHIDDriver(this.drawOnCanvas);
+        break;
+      case "USB":
+        this.signaturePadDriver = new SignaturePadUSBDriver(this.drawOnCanvas);
+        break;
+      default:
+        return;
+    }
+
+    // this.signaturePadDriver =
+    //   interfaceType === "SERIALPORT"
+    //     ? new SignaturePadSerialDriver(this.drawOnCanvas)
+    //     : new SignaturePadHIDDriver(this.drawOnCanvas);
     let deviceNumber = undefined;
     try {
       deviceNumber = await this.signaturePadDriver.connect(this.drawOnCanvas);

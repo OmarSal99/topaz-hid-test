@@ -1,16 +1,17 @@
 import { BaseDriver } from "./base-driver.js";
 
-export class SignaturePadHIDDriver extends BaseDriver {
+export class SignaturePadUSBDriver extends BaseDriver {
   constructor() {
     super();
     this.callbackFunction = null;
     this.parity = null;
     this.baudRate = null;
+    this.endPointIn = 0;
 
     // number of bytes that represent each point
     this.chunkSize = null;
     this.decodeFunction = null;
-    this.port = null;
+    this.device = null;
     this.bytesArray = [];
 
     // async read function that get called (it get store so await can be used on it later)
@@ -32,11 +33,11 @@ export class SignaturePadHIDDriver extends BaseDriver {
    */
   connect = async () => {
     // request the user to select a device (it will give permission to interact with the device)
-    let dev = await navigator.hid.requestDevice({ filters: [] });
-    this.port = dev[0];
-    console.log(this.port);
-    let vid = this.port.vendorId;
-    let pid = this.port.productId;
+    let dev = await navigator.usb.requestDevice({ filters: [] });
+    this.device = dev;
+    console.log(this.device);
+    let vid = this.device.vendorId;
+    let pid = this.device.productId;
     return { vid: vid, pid: pid };
   };
 
@@ -64,31 +65,67 @@ export class SignaturePadHIDDriver extends BaseDriver {
     };
 
     let defaultOptions = {
+      baudRate: 19200,
+      parity: "odd",
       chunkSize: 5,
       decodeFunction: _decodeFunction,
       callbackFunction: () => {},
     };
 
     options = { ...defaultOptions, ...options };
+    this.baudRate = options.baudRate;
+    this.parity = options.parity;
     this.chunkSize = options.chunkSize;
     this.decodeFunction = options.decodeFunction;
 
     // open a connection with that device
-    await this.port.open();
+    await this.device.open();
+    if (this.device.configuration === null) {
+      await this.device.selectConfiguration(1); // Choose appropriate configuration
+    }
+    let _interface = this.device.configuration.interfaces[0];
+    let interfaceNum = 0;
+    if (_interface) interfaceNum = _interface.interfaceNumber;
+    await this.device.claimInterface(interfaceNum);
+    console.log(_interface);
+    for (const endPoint of _interface.alternate.endpoints) {
+      if (endPoint.direction === "in" && endPoint.type === "bulk") {
+        this.endPointIn = endPoint.endpointNumber;
+      }
+    }
+    console.log(this.endPointIn);
     this.keepReading = true;
 
     // setTimeout(() => {
     //   console.log(new Uint8Array(decimalNumbersArray));
     //   this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
     // }, 3000);
+    try {
+      while (true) {
+        // Read data from the device
+        const result = await this.device.transferIn(this.endPointIn, 64); // Read data from endpoint 1, with a maximum packet size of 64 bytes
+        console.log(result.data);
+        // Process the received data
+        if (result.data.byteLength !== 2) {
+          let data = new Uint8Array(result.data.buffer);
+          this.process(data, new Date().getTime());
+        }
 
-    this.port.addEventListener("inputreport", (event) => {
-      if (this.keepReading) {
-        let data = new Uint8Array(event.data.buffer);
-        console.log(data.toString());
-        this.process(data, new Date().getTime());
+        // You can process or display the data here as needed
+
+        // Wait for a short interval before reading again
       }
-    });
+    } catch (error) {
+      console.error("Error reading data from USB device:", error);
+    }
+
+    // this.port.addEventListener("inputreport", (event) => {
+    //   if (this.keepReading) {
+    //     let data = new Uint8Array(event.data.buffer);
+    //     console.log(data.toString());
+    //     this.process(data, new Date().getTime());
+    //   }
+    // });
 
     // reset bytes array after 0.05s, it clear any old bytes were stuck in the buffer
     setTimeout(() => {
@@ -149,9 +186,9 @@ export class SignaturePadHIDDriver extends BaseDriver {
    * disconnect from the device
    */
   disconnect = async () => {
-    if (this.port != null) {
+    if (this.device != null) {
       this.keepReading = false;
-      await this.port.close();
+      await this.device.close();
     }
   };
 }
