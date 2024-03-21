@@ -36,7 +36,7 @@ export class BaseProfile {
    * @static
    * @type {number}
    */
-  static lineWidth = 4;
+  static lineWidth = 5;
 
   /**
    * the width of the canvas in pixels (it won't change the width that the user see on the page)
@@ -63,7 +63,7 @@ export class BaseProfile {
    */
   static decodeFunction = (bytes) => {
     // bytes length is 5, first byte is 0xc1 when the pen in drawing on the pad, anything other than it will be invalid
-    if (bytes[0] != 0xc1) return { x: null, y: null, invalid: true };
+    // if (bytes[0] != 0xc1) return { x: null, y: null, invalid: true };
 
     // 2ed and 3ed bytes are for x and 4th and 5th bytes are for y
     let x = 0;

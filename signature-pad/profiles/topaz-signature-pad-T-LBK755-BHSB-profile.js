@@ -1,19 +1,20 @@
 import { BaseProfile } from "./base-profile.js";
-// an example of new profile that made just for Topaz Signature Pad TLBK57GC-BHSB
+// an example of new profile that made just for Topaz Signature Pad TLBK755-BHSB
 // x and y for this device don't start from 0
 // overriding the decode function and the canvas height and width will do the trick
-export class TopazSignaturePadTLBK57GCBHSBProfile extends BaseProfile {
-  // on this signature pad x values are always between 400 and 40, left most is 500 and right most is 40
-  static leftCoordinate = 400;
-  static rightCoordinate = 2240;
+export class TopazSignaturePadTLBK755BHSBProfile extends BaseProfile {
+  // on this signature pad x values are always between 500 and 2280, left most is 500 and right most is 2280
+  static leftCoordinate = 700;
+  static rightCoordinate = 2470;
 
-  // same apply for y, always between 490 and 1810
-  static topCoordinate = 490;
-  static bottomCoordinate = 1810;
+  // same apply for y, always between 700 and 1640
+  static topCoordinate = 700;
+  static bottomCoordinate = 1640;
 
   // set the filter to only accept this device
   static filter = (vid, pid) => {
-    return vid == 0x06a8 && pid == 0x0047;
+    // return vid == 0x06a8 && pid == 0x0043;
+    return false
   };
   static chunkSize = 6;
 
@@ -25,7 +26,7 @@ export class TopazSignaturePadTLBK57GCBHSBProfile extends BaseProfile {
 
   static decodeFunction = (bytes) => {
     bytes = bytes.slice(1);
-    if (bytes[0] != 0xc1 && bytes[0] != 0xc0) {
+    if (bytes[0] != 0xe4) {
       return { x: null, y: null, invalid: true, ignore: true };
     }
     let bytesObj = super.decodeFunction(bytes);

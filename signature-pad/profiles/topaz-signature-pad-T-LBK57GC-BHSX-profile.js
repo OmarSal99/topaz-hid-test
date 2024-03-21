@@ -1,20 +1,21 @@
 import { BaseProfile } from "./base-profile.js";
-// an example of new profile that made just for Topaz Signature Pad TLBK57GC-BHSB
+// an example of new profile that made just for Topaz Signature Pad TLBK57GC-BHSX
 // x and y for this device don't start from 0
 // overriding the decode function and the canvas height and width will do the trick
-export class TopazSignaturePadTLBK57GCBHSBProfile extends BaseProfile {
-  // on this signature pad x values are always between 400 and 40, left most is 500 and right most is 40
+export class TopazSignaturePadTLBK57GCBHSXProfile extends BaseProfile {
+  // on this signature pad x values are always between 400 and 2240, left most is 400 and right most is 2240
   static leftCoordinate = 400;
   static rightCoordinate = 2240;
 
-  // same apply for y, always between 490 and 1810
-  static topCoordinate = 490;
-  static bottomCoordinate = 1810;
+  // same apply for y, always between 470 and 1830
+  static topCoordinate = 470;
+  static bottomCoordinate = 1830;
 
   // set the filter to only accept this device
   static filter = (vid, pid) => {
-    return vid == 0x06a8 && pid == 0x0047;
+    return vid == 0x06a8 && pid == 0x0057;
   };
+
   static chunkSize = 6;
 
   // width is the diffrence between right and left

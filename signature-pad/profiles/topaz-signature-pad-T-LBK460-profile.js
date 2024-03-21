@@ -1,8 +1,8 @@
 import { BaseProfile } from "./base-profile.js";
-// an example of new profile that made just for Topaz Signature Pad TLBK460
+// an example of new profile that made just for Topaz Signature Pad TLBK460-BSB
 // x and y for this device don't start from 0
 // overriding the decode function and the canvas height and width will do the trick
-export class TopazSignaturePadTLBK460Pofile extends BaseProfile {
+export class TopazSignaturePadTLBK460BSBProfile extends BaseProfile {
   // on this signature pad x values are always between 500 and 2280, left most is 500 and right most is 2280
   static leftCoordinate = 500;
   static rightCoordinate = 2280;
