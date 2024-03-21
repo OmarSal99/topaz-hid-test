@@ -140,6 +140,10 @@ export class SignaturePadSerialDriver extends BaseDriver {
       decodedObj = this.decodeFunction(
         this.bytesArray.slice(0, this.chunkSize)
       );
+      if ("ignore" in decodedObj && decodedObj.ignore === true) {
+        this.bytesArray.splice(0, this.chunkSize);
+        continue;
+      }
       if ("invalid" in decodedObj && decodedObj.invalid === true) {
         this.lastX = null;
         this.lastY = null;

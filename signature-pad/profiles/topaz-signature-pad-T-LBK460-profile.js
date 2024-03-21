@@ -6,7 +6,7 @@ export class TopazSignaturePadTLBK460BSBProfile extends BaseProfile {
   // on this signature pad x values are always between 500 and 2280, left most is 500 and right most is 2280
   static leftCoordinate = 500;
   static rightCoordinate = 2280;
-  
+
   // same apply for y, always between 450 and 975
   static topCoordinate = 450;
   static bottomCoordinate = 975;
@@ -23,11 +23,11 @@ export class TopazSignaturePadTLBK460BSBProfile extends BaseProfile {
   static canvasHeight = this.bottomCoordinate - this.topCoordinate;
 
   static decodeFunction = (bytes) => {
+    if (bytes[0] != 0xc1) return { x: null, y: null, invalid: true };
+
     let bytesObj = super.decodeFunction(bytes);
-    if(bytesObj.x!=null)
-        bytesObj.x = bytesObj.x-this.leftCoordinate;
-    if(bytesObj.y!=null)
-        bytesObj.y = bytesObj.y-this.topCoordinate;
+    if (bytesObj.x != null) bytesObj.x = bytesObj.x - this.leftCoordinate;
+    if (bytesObj.y != null) bytesObj.y = bytesObj.y - this.topCoordinate;
     return bytesObj;
   };
 }
