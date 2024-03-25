@@ -25,8 +25,8 @@ export class TopazSignaturePadTLBK57GCBHSBProfile extends BaseProfile {
 
   static decodeFunction = (bytes) => {
     bytes = bytes.slice(1);
-    if (bytes[0] != 0xc1 && bytes[0] != 0xc0) {
-      return { x: null, y: null, invalid: true, ignore: true };
+    if (bytes[0] != 0xc1) {
+      return { x: null, y: null, invalid: true };
     }
     let bytesObj = super.decodeFunction(bytes);
     if (bytesObj.x != null) bytesObj.x = bytesObj.x - this.leftCoordinate;
