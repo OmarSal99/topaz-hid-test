@@ -35,11 +35,13 @@ export class SignaturePadHIDDriver extends BaseDriver {
     // request the user to select a device (it will give permission to interact with the device)
     let dev = await navigator.hid.requestDevice({ filters: [] });
     let usbDevices = await navigator.usb.getDevices();
-    console.log(usbDevices);
     this.port = dev[0];
-    console.log(this.port);
     let vid = this.port.vendorId;
     let pid = this.port.productId;
+    const usbDevice = usbDevices.find(
+      (dev) => dev.vendorId == vid && dev.productId == pid
+    );
+    console.log("usbDevice:", usbDevice);
     return { vid: vid, pid: pid };
   };
 

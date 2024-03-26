@@ -3,7 +3,7 @@ import { BaseProfile } from "./base-profile.js";
 // x and y for this device don't start from 0
 // overriding the decode function and the canvas height and width will do the trick
 export class TopazSignaturePadTLBK57GCBHSBProfile extends BaseProfile {
-  // on this signature pad x values are always between 400 and 40, left most is 500 and right most is 40
+  // on this signature pad x values are always between 400 and 2240
   static leftCoordinate = 400;
   static rightCoordinate = 2240;
 
