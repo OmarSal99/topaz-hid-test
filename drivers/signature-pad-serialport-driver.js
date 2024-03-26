@@ -33,9 +33,13 @@ export class SignaturePadSerialDriver extends BaseDriver {
   connect = async () => {
     // request the user to select a device (it will give permission to interact with the device)
     this.port = await navigator.serial.requestPort();
-
+    let usbDevices = await navigator.usb.getDevices();
     let vid = this.port.getInfo().usbVendorId;
     let pid = this.port.getInfo().usbProductId;
+    const usbDevice = usbDevices.find(
+      (dev) => dev.vendorId == vid && dev.productId == pid
+    );
+    console.log("usbDevice:", usbDevice);
     return { vid: vid, pid: pid };
   };
 
