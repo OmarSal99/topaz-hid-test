@@ -18,11 +18,11 @@ export class BaseProfile {
   static baudRate = 15200; // should be 19200
 
   /**
-   * the party check, values could be "none", "odd" or "even"
+   * the parity check, values could be "none", "odd" or "even"
    * @static
    * @type {string}
    */
-  static parity = "odd";
+  static parity = "none";
 
   /**
    * the number of bytes that represent each point, integer with range bewteen 1, Infinity
