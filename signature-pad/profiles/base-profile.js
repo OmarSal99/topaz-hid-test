@@ -15,7 +15,7 @@ export class BaseProfile {
    * @static
    * @type {number}
    */
-  static baudRate = 19200;
+  static baudRate = 15200; // should be 19200
 
   /**
    * the party check, values could be "none", "odd" or "even"
