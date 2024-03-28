@@ -22,7 +22,7 @@ export class BaseProfile {
    * @static
    * @type {string}
    */
-  static parity = "none";
+  static parity = "even";
 
   /**
    * the number of bytes that represent each point, integer with range bewteen 1, Infinity
