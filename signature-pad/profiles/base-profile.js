@@ -15,14 +15,14 @@ export class BaseProfile {
    * @static
    * @type {number}
    */
-  static baudRate = 15200; // should be 19200
+  static baudRate = 115200; // should be 19200
 
   /**
    * the parity check, values could be "none", "odd" or "even"
    * @static
    * @type {string}
    */
-  static parity = "even";
+  static parity = "odd";
 
   /**
    * the number of bytes that represent each point, integer with range bewteen 1, Infinity
