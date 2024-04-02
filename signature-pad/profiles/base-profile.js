@@ -15,7 +15,7 @@ export class BaseProfile {
    * @static
    * @type {number}
    */
-  static baudRate = 115200; //should be 19200
+  static baudRate = 19200; //should be 19200
 
   /**
    * the parity check, values could be "none", "odd" or "even"

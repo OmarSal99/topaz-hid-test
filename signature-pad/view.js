@@ -1,3 +1,5 @@
+import { profiles } from "./profiles/profile-list.js";
+
 const canvasId = "canvas";
 const modalId = "modal";
 const connectButtonModalId = "open-interface-modal-button";
@@ -17,6 +19,46 @@ export const signaturePadView = (function () {
       .then((html) => {
         // Inject the content into the container
         document.getElementById(deviceSpaceId).innerHTML = html;
+      })
+      .catch((error) => console.error("Error loading HTML:", error));
+  }
+
+  /**
+   * load html component in the dom
+   */
+  async function loadModelsList(onSelect) {
+    await fetch("signature-pad/templates/models-list.html")
+      .then((response) => response.text())
+      .then((html) => {
+        // Inject the content into the container
+        document.getElementById(deviceSpaceId).innerHTML = html;
+      })
+      .then(() => {
+        const dropDownContainer = document.getElementById("model-dropdown-div");
+        const dropDownBody = document.createElement("div");
+        dropDownBody.setAttribute("class", "dropdown-content");
+
+        for (const profile of profiles) {
+          let action = () => {
+            // if (device.CONTROLLER != currentActiveController.CONTROLLER) {
+            // currentActiveController.CONTROLLER?.destroy();
+            // currentActiveController.CONTROLLER = device.CONTROLLER;
+            document.getElementById("model-drop-down-title").textContent =
+              profile.LABEL;
+            console.log("view", profile);
+
+            onSelect(profile);
+            // showDevice(device.CONTROLLER);
+            // }
+          };
+
+          const element = document.createElement("p");
+          element.setAttribute("class", "dropdown-elements");
+          element.textContent = profile.LABEL;
+          element.addEventListener("click", action);
+          dropDownBody.appendChild(element);
+        }
+        dropDownContainer.appendChild(dropDownBody);
       })
       .catch((error) => console.error("Error loading HTML:", error));
   }
@@ -205,6 +247,7 @@ export const signaturePadView = (function () {
   return {
     bindControlButtons,
     loadHtml,
+    loadModelsList,
     connect,
     showModal,
     hideModal,
