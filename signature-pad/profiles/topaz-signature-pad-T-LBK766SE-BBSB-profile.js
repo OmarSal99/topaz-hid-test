@@ -32,7 +32,6 @@ export class TopazSignaturePadTLBK766SEBBSBProfile extends BaseProfile {
       return { x: null, y: null, invalid: true, ignore: true };
     if (bytes[0] != 0xc1) return { x: null, y: null, invalid: true };
     let bytesObj = super.decodeFunction(bytes);
-    console.log("real", bytesObj.x, bytesObj.y);
     if (bytesObj.x != null) bytesObj.x = bytesObj.x - this.leftCoordinate;
     if (bytesObj.y != null) bytesObj.y = bytesObj.y - this.topCoordinate;
     return bytesObj;
