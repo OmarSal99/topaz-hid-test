@@ -31,7 +31,7 @@ export const signaturePadView = (function () {
       .then((response) => response.text())
       .then((html) => {
         // Inject the content into the container
-        document.getElementById(deviceSpaceId).innerHTML = html;
+        document.getElementById("signature-pad-space").innerHTML = html;
       })
       .then(() => {
         const dropDownContainer = document.getElementById("model-dropdown-div");
