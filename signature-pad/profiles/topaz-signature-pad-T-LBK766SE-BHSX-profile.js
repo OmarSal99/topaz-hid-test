@@ -13,8 +13,8 @@ export class TopazSignaturePadTLBK766SEBHSXProfile extends BaseProfile {
 
   // set the filter to only accept this device
   static filter = (vid, pid) => {
-    return false;
-    // return vid == 0x06a8 && pid == 0x0057;
+    // return false;
+    return vid == 0x06a8 && pid == 0x0057;
   };
   static chunkSize = 6;
 
