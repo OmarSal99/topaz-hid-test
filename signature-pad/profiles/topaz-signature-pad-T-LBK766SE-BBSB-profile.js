@@ -1,22 +1,25 @@
 import { BaseProfile } from "./base-profile.js";
-// an example of new profile that made just for Topaz Signature Pad TLBK766SE-BHSX
+// an example of new profile that made just for Topaz Signature Pad TLBK766SE-BBSB
 // x and y for this device don't start from 0
 // overriding the decode function and the canvas height and width will do the trick
-export class TopazSignaturePadTLBK766SEBHSXProfile extends BaseProfile {
-  // on this signature pad x values are always between 620 and 2490
+export class TopazSignaturePadTLBK766SEBBSBProfile extends BaseProfile {
+  // on this signature pad x values are always between 620 and 2475
   static leftCoordinate = 620;
-  static rightCoordinate = 2490;
+  static rightCoordinate = 2475;
 
-  // same apply for y, always between 640 and 1990
-  static topCoordinate = 640;
-  static bottomCoordinate = 1990;
+  // same apply for y, always between 625 and 2000
+  static topCoordinate = 625;
+  static bottomCoordinate = 2000;
 
   // set the filter to only accept this device
   static filter = (vid, pid) => {
-    // return false;
-    return vid == 0x06a8 && pid == 0x0057;
+    return false;
+    // return vid == 0x06a8 && pid == 0x0057;
   };
-  static chunkSize = 6;
+
+  static baudRate = 115200;
+
+  static chunkSize = 5;
 
   // width is the diffrence between right and left
   static canvasWidth = this.rightCoordinate - this.leftCoordinate;
@@ -25,7 +28,6 @@ export class TopazSignaturePadTLBK766SEBHSXProfile extends BaseProfile {
   static canvasHeight = this.bottomCoordinate - this.topCoordinate;
 
   static decodeFunction = (bytes) => {
-    bytes = bytes.slice(1);
     if (bytes[0] != 0xc1 && bytes[0] != 0xc0)
       return { x: null, y: null, invalid: true, ignore: true };
     if (bytes[0] != 0xc1) return { x: null, y: null, invalid: true };

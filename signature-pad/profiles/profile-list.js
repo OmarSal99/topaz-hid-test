@@ -8,6 +8,9 @@ import { TopazSignaturePadTLBK755SEBHSBProfile } from "./TLBK755SE-BHSB-profile.
 import { TopazSignaturePadTLBK57GCBBSBProfile } from "./TLBK57GC-BBSB-profile.js";
 import { TopazSignaturePadTLBKHSXProfile } from "./HSX-profile.js";
 import { TopazSignaturePadTLBK57GCBHSBProfile } from "./TLBK57GC-BHSB-R-profile.js";
+import { TopazSignaturePadTLBK755SEBBSBProfile } from "./topaz-siganture-pad-T-LBK755SE-BBSB-profile.js";
+import { TopazSignaturePadTLBK766SEBBSBProfile } from "./topaz-signature-pad-T-LBK766SE-BBSB-profile.js";
+import { TopazSignaturePadTLBK755BBSBProfile } from "./topaz-signature-pad-T-LBK755-BBSB-profile.js";
 
 export const profiles = [
   Object.freeze({
@@ -45,6 +48,18 @@ export const profiles = [
   Object.freeze({
     LABEL: "T-LBK57GC-BBSB-R",
     PROFILE: TopazSignaturePadTLBK57GCBBSBProfile,
+  }),
+  Object.freeze({
+    LABEL: "Topaz-signature-pad-T-LBK755SE-BBSB",
+    PROFILE: TopazSignaturePadTLBK755SEBBSBProfile,
+  }),
+  Object.freeze({
+    LABEL: "Topaz-signature-pad-T-LBK766SE-BBSB",
+    PROFILE: TopazSignaturePadTLBK766SEBBSBProfile,
+  }),
+  Object.freeze({
+    LABEL: "Topaz-signature-pad-T-LBK755-BBSB",
+    PROFILE: TopazSignaturePadTLBK755BBSBProfile,
   }),
   Object.freeze({
     LABEL: "default profile",
