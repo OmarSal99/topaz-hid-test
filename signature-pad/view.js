@@ -31,7 +31,16 @@ export const signaturePadView = (function () {
       .then((response) => response.text())
       .then((html) => {
         // Inject the content into the container
-        document.getElementById("signature-pad-space").innerHTML = html;
+        if (!document.getElementById("list-container")) {
+          const listContainer = document.createElement("div");
+          listContainer.id = "list-container";
+          listContainer.innerHTML = html;
+
+          const deviceContainer = document.getElementById(
+            "signature-pad-space"
+          );
+          deviceContainer.insertAdjacentElement("afterbegin", listContainer);
+        }
       })
       .then(() => {
         const dropDownContainer = document.getElementById("model-dropdown-div");

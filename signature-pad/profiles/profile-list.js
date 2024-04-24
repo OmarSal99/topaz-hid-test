@@ -11,39 +11,39 @@ import { TopazSignaturePadTLBK57GCBHSBProfile } from "./TLBK57GC-BHSB-R-profile.
 
 export const profiles = [
   Object.freeze({
-    LABEL: "TLBK460-BSB",
+    LABEL: "T-LBK460-BSB-R",
     PROFILE: TopazSignaturePadTLBK460BSBProfile,
   }),
   Object.freeze({
-    LABEL: "TLBK-HSX",
+    LABEL: "T-LBK-HSX",
     PROFILE: TopazSignaturePadTLBKHSXProfile,
   }),
   Object.freeze({
-    LABEL: "TLBK57GC-BHSB",
+    LABEL: "T-LBK57GC-BHSB-R",
     PROFILE: TopazSignaturePadTLBK57GCBHSBProfile,
   }),
   Object.freeze({
-    LABEL: "TLBK755-BHSB",
+    LABEL: "T-LBK755-BHSB-R",
     PROFILE: TopazSignaturePadTLBK755BHSBProfile,
   }),
   Object.freeze({
-    LABEL: "TLBK57GC-BHSX",
+    LABEL: "T-LBK57GC-BHSX-R",
     PROFILE: TopazSignaturePadTLBK57GCBHSXProfile,
   }),
   Object.freeze({
-    LABEL: "TLBK766SE-BHSX",
+    LABEL: "T-LBK766SE-BHSX-R",
     PROFILE: TopazSignaturePadTLBK766SEBHSXProfile,
   }),
   Object.freeze({
-    LABEL: "TLBK462-BSB",
+    LABEL: "T-LBK462-BSB-R",
     PROFILE: TopazSignaturePadTLBK462BSBProfile,
   }),
   Object.freeze({
-    LABEL: "TLBK755SE-BHSB",
+    LABEL: "T-LBK755SE-BHSB-R",
     PROFILE: TopazSignaturePadTLBK755SEBHSBProfile,
   }),
   Object.freeze({
-    LABEL: "TLBK57GC-BBSB",
+    LABEL: "T-LBK57GC-BBSB-R",
     PROFILE: TopazSignaturePadTLBK57GCBBSBProfile,
   }),
   Object.freeze({

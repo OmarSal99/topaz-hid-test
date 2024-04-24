@@ -27,6 +27,7 @@ export class SignaturePadController extends BaseController {
 
     this.lineWidth = null;
     this.currentProfile = null;
+    this.loadedHTML = false;
   }
 
   /**
@@ -36,13 +37,17 @@ export class SignaturePadController extends BaseController {
     await signaturePadView.loadModelsList(async (profile) => {
       this.currentProfile = profile.PROFILE;
       console.log("curren", this.currentProfile.baudRate);
-      await signaturePadView.loadHtml();
-      signaturePadView.bindControlButtons(
-        this.connect,
-        this.disconnect,
-        this.clearCanvas,
-        this.downloadImage
-      );
+      if (!this.loadedHTML) {
+        await signaturePadView.loadHtml();
+        signaturePadView.bindControlButtons(
+          this.connect,
+          this.disconnect,
+          this.clearCanvas,
+          this.downloadImage
+        );
+        this.loadedHTML = true;
+      }
+
       this.clearCanvas();
       console.log(this.currentProfile);
 
@@ -57,12 +62,7 @@ export class SignaturePadController extends BaseController {
     });
 
     // await signaturePadView.loadHtml();
-    // signaturePadView.bindControlButtons(
-    //   this.connect,
-    //   this.disconnect,
-    //   this.clearCanvas,
-    //   this.downloadImage
-    // );
+
     // this.clearCanvas();
   };
 
