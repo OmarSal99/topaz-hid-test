@@ -26,20 +26,48 @@ export class SignaturePadController extends BaseController {
     this.yEnd = null;
 
     this.lineWidth = null;
+    this.currentProfile = null;
+    this.loadedHTML = false;
+    this.connectedDevice = false;
   }
 
   /**
    * render the html componenet to the dom and bind buttons
    */
   render = async () => {
-    await signaturePadView.loadHtml();
-    signaturePadView.bindControlButtons(
-      this.connect,
-      this.disconnect,
-      this.clearCanvas,
-      this.downloadImage
-    );
-    this.clearCanvas();
+    await signaturePadView.loadModelsList(async (profile) => {
+      this.currentProfile = profile.PROFILE;
+      console.log("curren", this.currentProfile.baudRate);
+      if (this.signaturePadDriver != null && this.connectedDevice) {
+        this.disconnect();
+      }
+      if (!this.loadedHTML) {
+        await signaturePadView.loadHtml();
+        signaturePadView.bindControlButtons(
+          this.connect,
+          this.disconnect,
+          this.clearCanvas,
+          this.downloadImage
+        );
+        this.loadedHTML = true;
+      }
+
+      this.clearCanvas();
+      console.log(this.currentProfile);
+
+      this.lineWidth = this.currentProfile.lineWidth;
+
+      // css scale is 2:1 (width:height), it rescale it and add extra pixels if needed
+      // this will only effect the view (having empty space), the download image will stay the same
+      signaturePadView.updateCanvasSize(
+        this.currentProfile.canvasWidth,
+        this.currentProfile.canvasHeight
+      );
+    });
+
+    // await signaturePadView.loadHtml();
+
+    // this.clearCanvas();
   };
 
   /**
@@ -67,37 +95,29 @@ export class SignaturePadController extends BaseController {
       return;
     }
     // search for a suitable profile using filter function
-    let i = 0;
-    for (; i < profiles.length; i++) {
-      if (profiles[i].PROFILE.filter(deviceNumber.vid, deviceNumber.pid)) break;
-    }
-    if (i >= profiles.length) {
-      alert(
-        "Couldn't find suitable profile for that device! device could be not supported"
-      );
-      signaturePadView.setConnectButtonInner(connectInner);
-      signaturePadView.enableConnectButton();
-      return;
-    }
-    let profile = profiles[i].PROFILE;
-
-    this.lineWidth = profile.lineWidth;
-
-    // css scale is 2:1 (width:height), it rescale it and add extra pixels if needed
-    // this will only effect the view (having empty space), the download image will stay the same
-    signaturePadView.updateCanvasSize(
-      profile.canvasWidth,
-      profile.canvasHeight
-    );
+    // let i = 0;
+    // for (; i < profiles.length; i++) {
+    //   if (profiles[i].PROFILE.filter(deviceNumber.vid, deviceNumber.pid)) break;
+    // }
+    // if (i >= profiles.length) {
+    //   alert(
+    //     "Couldn't find suitable profile for that device! device could be not supported"
+    //   );
+    //   signaturePadView.setConnectButtonInner(connectInner);
+    //   signaturePadView.enableConnectButton();
+    //   return;
+    // }
+    // let profile = profiles[i].PROFILE;
 
     try {
       this.signaturePadDriver.open({
-        baudRate: profile.baudRate,
-        parity: profile.parity,
-        chunkSize: profile.chunkSize,
-        decodeFunction: profile.decodeFunction,
+        baudRate: this.currentProfile.baudRate,
+        parity: this.currentProfile.parity,
+        chunkSize: this.currentProfile.chunkSize,
+        decodeFunction: this.currentProfile.decodeFunction,
         callbackFunction: this.drawOnCanvas,
       });
+      this.connectedDevice = true;
     } catch (error) {
       console.error(error);
       signaturePadView.setConnectButtonInner(connectInner);

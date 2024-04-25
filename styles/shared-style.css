@@ -46,13 +46,13 @@
 }
 
 .wrapper-horizontal {
-  padding: 35px 20px;
   display: flex;
   flex-direction: column;
   gap: 30px;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 body {
@@ -110,6 +110,10 @@ body {
   min-width: 10em;
   width: 200px;
   position: relative;
+}
+
+.models-dropdown {
+  width: 300px;
 }
 
 .dropdown * {
@@ -171,6 +175,8 @@ body {
   transform: translateX(-50%);
   display: none;
   transition: 0.2s;
+  max-height: 400px;
+  overflow: auto;
 }
 
 .dropdown:hover .dropdown-content {
@@ -220,6 +226,16 @@ body {
 
 #theme-icon:hover {
   cursor: pointer;
+}
+
+#signature-pad-space {
+  height: 100%;
+  padding: 35px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
 }
 
 .card {

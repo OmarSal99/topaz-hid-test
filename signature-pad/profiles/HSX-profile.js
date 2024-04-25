@@ -12,6 +12,7 @@ export class TopazSignaturePadTLBKHSXProfile extends BaseProfile {
   static bottomCoordinate = 975;
 
   // set the filter to only accept this device
+  
   static filter = (vid, pid) => {
     return vid == 0x06a8 && pid == 0x0043;
   };
