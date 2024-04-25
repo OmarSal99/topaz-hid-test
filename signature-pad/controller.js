@@ -28,6 +28,7 @@ export class SignaturePadController extends BaseController {
     this.lineWidth = null;
     this.currentProfile = null;
     this.loadedHTML = false;
+    this.connectedDevice = false;
   }
 
   /**
@@ -37,6 +38,9 @@ export class SignaturePadController extends BaseController {
     await signaturePadView.loadModelsList(async (profile) => {
       this.currentProfile = profile.PROFILE;
       console.log("curren", this.currentProfile.baudRate);
+      if (this.signaturePadDriver != null && this.connectedDevice) {
+        this.disconnect();
+      }
       if (!this.loadedHTML) {
         await signaturePadView.loadHtml();
         signaturePadView.bindControlButtons(
@@ -113,6 +117,7 @@ export class SignaturePadController extends BaseController {
         decodeFunction: this.currentProfile.decodeFunction,
         callbackFunction: this.drawOnCanvas,
       });
+      this.connectedDevice = true;
     } catch (error) {
       console.error(error);
       signaturePadView.setConnectButtonInner(connectInner);

@@ -175,6 +175,8 @@ body {
   transform: translateX(-50%);
   display: none;
   transition: 0.2s;
+  max-height: 400px;
+  overflow: auto;
 }
 
 .dropdown:hover .dropdown-content {
