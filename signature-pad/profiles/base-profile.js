@@ -1,3 +1,5 @@
+import { connectionInterfaces } from "../../constants/connection-interfaces.js";
+
 export class BaseProfile {
   /**
    * a function taht take vid and pid and return whether if this profile is suitable for that device or not
@@ -9,6 +11,13 @@ export class BaseProfile {
   static filter = (vid, pid) => {
     return false;
   };
+
+  /**
+   * Communication type with the device, Could be SERIALPORT or HID
+   * @static
+   * @type {string}
+   */
+  static connectionInterface = connectionInterfaces.SERIALPORT;
 
   /**
    * baudRate on the port, integer with range bewteen 1, Infinity
