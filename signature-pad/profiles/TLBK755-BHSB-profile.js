@@ -1,3 +1,4 @@
+import { connectionInterfaces } from "../../constants/connection-interfaces.js";
 import { BaseProfile } from "./base-profile.js";
 // an example of new profile that made just for Topaz Signature Pad TLBK755-BHSB
 // x and y for this device don't start from 0
@@ -16,6 +17,9 @@ export class TopazSignaturePadTLBK755BHSBProfile extends BaseProfile {
     // return vid == 0x06a8 && pid == 0x0043;
     return false;
   };
+
+  static connectionInterface = connectionInterfaces.HID;
+
   static chunkSize = 6;
 
   // width is the diffrence between right and left

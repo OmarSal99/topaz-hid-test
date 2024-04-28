@@ -3,6 +3,7 @@ import { SignaturePadSerialDriver } from "../drivers//signature-pad-serialport-d
 import { SignaturePadHIDDriver } from "../drivers/signature-pad-hid-driver.js";
 import { BaseController } from "../controllers/base-controller.js";
 import { profiles } from "./profiles/profile-list.js";
+import { connectionInterfaces } from "../constants/connection-interfaces.js";
 
 export class SignaturePadController extends BaseController {
   static instance;
@@ -37,7 +38,6 @@ export class SignaturePadController extends BaseController {
   render = async () => {
     await signaturePadView.loadModelsList(async (profile) => {
       this.currentProfile = profile.PROFILE;
-      console.log("curren", this.currentProfile.baudRate);
       if (this.signaturePadDriver != null && this.connectedDevice) {
         this.disconnect();
       }
@@ -53,7 +53,6 @@ export class SignaturePadController extends BaseController {
       }
 
       this.clearCanvas();
-      console.log(this.currentProfile);
 
       this.lineWidth = this.currentProfile.lineWidth;
 
@@ -81,7 +80,8 @@ export class SignaturePadController extends BaseController {
     let connectInner = signaturePadView.connect("connecting ...");
 
     this.signaturePadDriver =
-      interfaceType === "SERIALPORT"
+      this.currentProfile.connectionInterface ===
+      connectionInterfaces.SERIALPORT
         ? new SignaturePadSerialDriver(this.drawOnCanvas)
         : new SignaturePadHIDDriver(this.drawOnCanvas);
     let deviceNumber = undefined;

@@ -1,3 +1,4 @@
+import { connectionInterfaces } from "../../constants/connection-interfaces.js";
 import { BaseProfile } from "./base-profile.js";
 // an example of new profile that made just for Topaz Signature Pad TLBK-HSX
 // x and y for this device don't start from 0
@@ -12,10 +13,13 @@ export class TopazSignaturePadTLBKHSXProfile extends BaseProfile {
   static bottomCoordinate = 975;
 
   // set the filter to only accept this device
-  
+
   static filter = (vid, pid) => {
     return vid == 0x06a8 && pid == 0x0043;
   };
+
+  static connectionInterface = connectionInterfaces.HID;
+
   static chunkSize = 6;
 
   // width is the diffrence between right and left

@@ -82,12 +82,12 @@ export const signaturePadView = (function () {
   function bindControlButtons(connect, disconnect, clearCanvas, downloadImage) {
     document
       .getElementById(connectButtonModalId)
-      .addEventListener("click", showModal);
+      .addEventListener("click", connect);
 
-    document.getElementById(connectButtonId).addEventListener("click", (e) => {
-      hideModal();
-      connect(getIntefaceType());
-    });
+    // document.getElementById(connectButtonId).addEventListener("click", (e) => {
+    //   hideModal();
+    //   connect(getIntefaceType());
+    // });
 
     document
       .getElementById(disconnectButtonId)

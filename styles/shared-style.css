@@ -41,6 +41,20 @@
   color: var(--black-to-white);
 }
 
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #aaa;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+  border-radius: 6px;
+}
+
 #header-middle h1 {
   color: #fff;
 }

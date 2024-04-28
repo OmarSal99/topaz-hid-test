@@ -5,6 +5,7 @@ const urlsToCache = [
   "assets/favicon.png",
   "assets/toggle-theme.png",
   "constants/devices.js",
+  "constants/connection-interfaces.js",
   "controllers/base-controller.js",
   "controllers/main-controller.js",
   "drivers/base-driver.js",
