@@ -84,7 +84,7 @@ export class SignaturePadSerialDriver extends BaseDriver {
     await this.port.open({
       baudRate: this.baudRate,
       parity: this.parity,
-      bufferSize: 16777216,
+      bufferSize: 1000000,
     });
 
     this.keepReading = true;
