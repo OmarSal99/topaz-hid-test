@@ -15,7 +15,7 @@ import { TopazSignaturePadTLBK462HSBProfile } from "./TLBK462-HSB-profile.js";
 
 export const profiles = [
   Object.freeze({
-    LABEL: "T-LBK460-BSB-R",
+    LABEL: "T-LBK460-BSB-R/T-S460-BSB-R",
     PROFILE: TopazSignaturePadTLBK460BSBProfile,
   }),
   Object.freeze({
@@ -55,7 +55,7 @@ export const profiles = [
     PROFILE: TopazSignaturePadTLBK755SEBBSBProfile,
   }),
   Object.freeze({
-    LABEL: "T-LBK766SE-BHSX-R",
+    LABEL: "T-LBK766SE-BHSX-R/T-LBK766SE-BHSB-R",
     PROFILE: TopazSignaturePadTLBK766SEBHSXProfile,
   }),
   Object.freeze({
