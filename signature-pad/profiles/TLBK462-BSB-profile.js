@@ -26,6 +26,7 @@ export class TopazSignaturePadTLBK462BSBProfile extends BaseProfile {
   static decodeFunction = (bytes) => {
     if (bytes[0] != 0xe5 && bytes[0] != 0xe4)
       return { x: null, y: null, invalid: true, ignore: true };
+    if (bytes[0] == 0xe4) return { x: null, y: null, penOut: true };
     if (bytes[0] != 0xe5) return { x: null, y: null, invalid: true };
 
     let bytesObj = super.decodeFunction(bytes);

@@ -1,5 +1,6 @@
 import { BaseDriver } from "./base-driver.js";
 // import { testData } from "./testData.js";
+var HID = require("node-hid");
 
 export class SignaturePadHIDDriver extends BaseDriver {
   constructor() {
@@ -33,16 +34,18 @@ export class SignaturePadHIDDriver extends BaseDriver {
    */
   connect = async () => {
     // request the user to select a device (it will give permission to interact with the device)
-    let dev = await navigator.hid.requestDevice({ filters: [] });
-    let usbDevices = await navigator.usb.getDevices();
-    this.port = dev[0];
-    let vid = this.port.vendorId;
-    let pid = this.port.productId;
-    const usbDevice = usbDevices.find(
-      (dev) => dev.vendorId == vid && dev.productId == pid
-    );
-    console.log("usbDevice:", usbDevice);
-    return { vid: vid, pid: pid };
+    // let dev = await navigator.hid.requestDevice({ filters: [] });
+    // let usbDevices = await navigator.usb.getDevices();
+    // this.port = dev[0];
+    // let vid = this.port.vendorId;
+    // let pid = this.port.productId;
+    // const usbDevice = usbDevices.find(
+    //   (dev) => dev.vendorId == vid && dev.productId == pid
+    // );
+    // console.log("usbDevice:", usbDevice);
+    var devices = await HID.devicesAsync();
+    console.log(devices);
+    return { vid: 0x0000, pid: 0x0000 };
   };
 
   /**
@@ -83,30 +86,30 @@ export class SignaturePadHIDDriver extends BaseDriver {
     this.decodeFunction = options.decodeFunction;
 
     // open a connection with that device
-    await this.port.open();
-    this.keepReading = true;
+    // await this.port.open();
+    // this.keepReading = true;
 
+    // // setTimeout(() => {
+    // //   let decimalNumbersArray = testData.trim().split(/\n|,/);
+    // //   // const decimalNumbersArray = lines.map((line) => [...line.trim().split(",")]);
+    // //   decimalNumbersArray = decimalNumbersArray.map((str) => +str);
+    // //   console.log(new Uint8Array(decimalNumbersArray));
+    // //   this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
+    // // }, 2000);
+
+    // this.port.addEventListener("inputreport", (event) => {
+    //   if (this.keepReading) {
+    //     let data = new Uint8Array(event.data.buffer);
+    //     console.log(data.toString());
+    //     this.process(data, new Date().getTime());
+    //   }
+    // });
+
+    // // reset bytes array after 0.05s, it clear any old bytes were stuck in the buffer
     // setTimeout(() => {
-    //   let decimalNumbersArray = testData.trim().split(/\n|,/);
-    //   // const decimalNumbersArray = lines.map((line) => [...line.trim().split(",")]);
-    //   decimalNumbersArray = decimalNumbersArray.map((str) => +str);
-    //   console.log(new Uint8Array(decimalNumbersArray));
-    //   this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
-    // }, 2000);
-
-    this.port.addEventListener("inputreport", (event) => {
-      if (this.keepReading) {
-        let data = new Uint8Array(event.data.buffer);
-        console.log(data.toString());
-        this.process(data, new Date().getTime());
-      }
-    });
-
-    // reset bytes array after 0.05s, it clear any old bytes were stuck in the buffer
-    setTimeout(() => {
-      this.bytesArray = [];
-      this.callbackFunction = options.callbackFunction;
-    }, 50);
+    //   this.bytesArray = [];
+    //   this.callbackFunction = options.callbackFunction;
+    // }, 50);
   };
 
   /**
@@ -120,9 +123,9 @@ export class SignaturePadHIDDriver extends BaseDriver {
     // device send limited number of points/s wich is around 120 times/s
     // to fix having gaps between points when user draw a line constantly it check the last time user draw
     // if it was less than 30ms ago it connect that 2 points with a line
-    let drawLine = false;
-    if (this.lastCallTime != null && this.lastCallTime + 30 > timeCalled)
-      drawLine = true;
+    let drawLine = true;
+    // if (this.lastCallTime != null && this.lastCallTime + 30 > timeCalled)
+    //   drawLine = true;
 
     this.bytesArray.push(...data);
     // while the bytesArray have over 6 elements (chunk size is 6) it keep processing data in it
@@ -139,6 +142,14 @@ export class SignaturePadHIDDriver extends BaseDriver {
         this.lastX = null;
         this.lastY = null;
         this.bytesArray.splice(0, this.chunkSize);
+        continue;
+      }
+      drawLine = true;
+      if ("penOut" in decodedObj) {
+        this.lastX = null;
+        this.lastY = null;
+        this.bytesArray.splice(0, this.chunkSize);
+        drawLine = false;
         continue;
       }
       let x = decodedObj.x;

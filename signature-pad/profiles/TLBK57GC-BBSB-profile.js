@@ -25,6 +25,7 @@ export class TopazSignaturePadTLBK57GCBBSBProfile extends BaseProfile {
   static canvasHeight = this.bottomCoordinate - this.topCoordinate;
 
   static decodeFunction = (bytes) => {
+    if (bytes[0] == 0xc0) return { x: null, y: null, penOut: true };
     if (bytes[0] != 0xc1) return { x: null, y: null, invalid: true };
 
     let bytesObj = super.decodeFunction(bytes);

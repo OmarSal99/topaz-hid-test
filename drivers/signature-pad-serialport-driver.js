@@ -1,4 +1,5 @@
 import { BaseDriver } from "./base-driver.js";
+const { SerialPort } = window.require("serialport");
 
 export class SignaturePadSerialDriver extends BaseDriver {
   constructor() {
@@ -32,15 +33,15 @@ export class SignaturePadSerialDriver extends BaseDriver {
    */
   connect = async () => {
     // request the user to select a device (it will give permission to interact with the device)
-    this.port = await navigator.serial.requestPort();
-    let usbDevices = await navigator.usb.getDevices();
-    let vid = this.port.getInfo().usbVendorId;
-    let pid = this.port.getInfo().usbProductId;
-    const usbDevice = usbDevices.find(
-      (dev) => dev.vendorId == vid && dev.productId == pid
-    );
-    console.log("usbDevice:", usbDevice);
-    return { vid: vid, pid: pid };
+    // this.port = await navigator.serial.requestPort();
+    // let usbDevices = await navigator.usb.getDevices();
+    // let vid = this.port.getInfo().usbVendorId;
+    // let pid = this.port.getInfo().usbProductId;
+    // const usbDevice = usbDevices.find(
+    //   (dev) => dev.vendorId == vid && dev.productId == pid
+    // );
+    // console.log("usbDevice:", usbDevice);
+    return { vid: 0x0403, pid: 0x6001 };
   };
 
   /**
@@ -81,38 +82,49 @@ export class SignaturePadSerialDriver extends BaseDriver {
     this.decodeFunction = options.decodeFunction;
 
     // open a connection with that device
-    await this.port.open({
-      baudRate: this.baudRate,
-      parity: this.parity,
-      bufferSize: 1000000,
+    // await this.port.open({
+    //   baudRate: this.baudRate,
+    //   parity: this.parity,
+    //   bufferSize: 1000000,
+    // });
+
+    this.port = new SerialPort({
+      path: "/dev/ttyUSB0",
+      parity: "odd",
+      baudRate: 19200,
     });
 
     this.keepReading = true;
+    this.port.on("data", (data) => {
+      console.log(data);
+
+      this.process(data, new Date().getTime());
+    });
 
     // read function, constantly read data (using await) until keepreading is false
-    let read = async () => {
-      this.reader = await this.port.readable.getReader();
-      while (this.port.readable && this.keepReading) {
-        try {
-          // reader will return done if reader.cancel() used and it will break the loop
-          while (true) {
-            const { value, done } = await this.reader.read();
-            if (done) {
-              break;
-            }
-            // call process and give data and the current time
-            console.log(value.toString());
-            this.process(value, new Date().getTime());
-          }
-        } catch (error) {
-          console.error(error);
-          break;
-        } finally {
-          await this.reader.releaseLock();
-        }
-      }
-    };
-    this.reading = read();
+    // let read = async () => {
+    //   this.reader = await this.port.readable.getReader();
+    //   while (this.port.readable && this.keepReading) {
+    //     try {
+    //       // reader will return done if reader.cancel() used and it will break the loop
+    //       while (true) {
+    //         const { value, done } = await this.reader.read();
+    //         if (done) {
+    //           break;
+    //         }
+    //         // call process and give data and the current time
+    //         console.log(value.toString());
+    //         this.process(value, new Date().getTime());
+    //       }
+    //     } catch (error) {
+    //       console.error(error);
+    //       break;
+    //     } finally {
+    //       await this.reader.releaseLock();
+    //     }
+    //   }
+    // };
+    // this.reading = read();
 
     // reset bytes array after 0.05s, it clear any old bytes were stuck in the buffer
     setTimeout(() => {
@@ -132,9 +144,9 @@ export class SignaturePadSerialDriver extends BaseDriver {
     // device send limited number of points/s wich is around 120 times/s
     // to fix having gaps between points when user draw a line constantly it check the last time user draw
     // if it was less than 30ms ago it connect that 2 points with a line
-    let drawLine = false;
-    if (this.lastCallTime != null && this.lastCallTime + 30 > timeCalled)
-      drawLine = true;
+    let drawLine = true;
+    // if (this.lastCallTime != null && this.lastCallTime + 30 > timeCalled)
+    //   drawLine = true;
 
     this.bytesArray.push(...data);
 
@@ -152,6 +164,14 @@ export class SignaturePadSerialDriver extends BaseDriver {
         this.lastX = null;
         this.lastY = null;
         this.bytesArray.splice(0, this.chunkSize);
+        continue;
+      }
+      drawLine = true;
+      if ("penOut" in decodedObj) {
+        this.lastX = null;
+        this.lastY = null;
+        this.bytesArray.splice(0, this.chunkSize);
+        drawLine = false;
         continue;
       }
       let x = decodedObj.x;
