@@ -132,9 +132,9 @@ export class SignaturePadSerialDriver extends BaseDriver {
     // device send limited number of points/s wich is around 120 times/s
     // to fix having gaps between points when user draw a line constantly it check the last time user draw
     // if it was less than 30ms ago it connect that 2 points with a line
-    let drawLine = false;
-    if (this.lastCallTime != null && this.lastCallTime + 30 > timeCalled)
-      drawLine = true;
+    let drawLine = true;
+    // if (this.lastCallTime != null && this.lastCallTime + 30 > timeCalled)
+    //   drawLine = true;
 
     this.bytesArray.push(...data);
 
@@ -152,6 +152,14 @@ export class SignaturePadSerialDriver extends BaseDriver {
         this.lastX = null;
         this.lastY = null;
         this.bytesArray.splice(0, this.chunkSize);
+        continue;
+      }
+      drawLine = true;
+      if ("penOut" in decodedObj) {
+        this.lastX = null;
+        this.lastY = null;
+        this.bytesArray.splice(0, this.chunkSize);
+        drawLine = false;
         continue;
       }
       let x = decodedObj.x;
