@@ -13,6 +13,19 @@ export class BaseProfile {
   };
 
   /**
+   * control byte indicates that the pen physically touching the pad.
+   * @static
+   * @type {number}
+   */
+  static penDownByte = 0xc1;
+  /**
+   * control byte indicates that the pen close to but Not touching the pad.
+   * @static
+   * @type {number}
+   */
+  static penUpByte = 0xc0;
+
+  /**
    * Communication type with the device, Could be SERIALPORT or HID
    * @static
    * @type {string}

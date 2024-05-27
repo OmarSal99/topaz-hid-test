@@ -7,6 +7,10 @@ export class SignaturePadSerialDriver extends BaseDriver {
     this.callbackFunction = null;
     this.parity = null;
     this.baudRate = null;
+    this.path = null;
+
+    this.penDownByte = null;
+    this.penUpByte = null;
 
     // number of bytes that represent each point
     this.chunkSize = null;
@@ -25,23 +29,20 @@ export class SignaturePadSerialDriver extends BaseDriver {
     this.lastCallTime = null;
     this.lastX = null;
     this.lastY = null;
+    this.locked = false;
   }
 
   /**
    * request a device from the user, return it's pid and vid
-   * @returns {{vid: Number, pid: Number}}
+   * @param {{vid: Number, pid: Number}}
    */
-  connect = async () => {
-    // request the user to select a device (it will give permission to interact with the device)
-    // this.port = await navigator.serial.requestPort();
-    // let usbDevices = await navigator.usb.getDevices();
-    // let vid = this.port.getInfo().usbVendorId;
-    // let pid = this.port.getInfo().usbProductId;
-    // const usbDevice = usbDevices.find(
-    //   (dev) => dev.vendorId == vid && dev.productId == pid
-    // );
-    // console.log("usbDevice:", usbDevice);
-    return { vid: 0x0403, pid: 0x6001 };
+  connect = async ({ vid, pid }) => {
+    const devices = await SerialPort.list();
+    const device = devices.find(
+      (dev) =>
+        parseInt(dev.vendorId, 16) == vid && parseInt(dev.productId, 16) == pid
+    );
+    if (device) this.path = device.path;
   };
 
   /**
@@ -55,7 +56,8 @@ export class SignaturePadSerialDriver extends BaseDriver {
   open = async (options = {}) => {
     let _decodeFunction = (bytes) => {
       // bytes length is 5, first byte is 0xc1 when the pen in drawing on the pad, anything other than it will be invalid
-      if (bytes[0] != 0xc1) return { x: null, y: null, invalid: true };
+      if (bytes[0] != this.penDownByte)
+        return { x: null, y: null, invalid: true };
 
       // 2ed and 3ed bytes are for x and 4th and 5th bytes are for y
       let x = 0;
@@ -80,51 +82,20 @@ export class SignaturePadSerialDriver extends BaseDriver {
     this.parity = options.parity;
     this.chunkSize = options.chunkSize;
     this.decodeFunction = options.decodeFunction;
-
-    // open a connection with that device
-    // await this.port.open({
-    //   baudRate: this.baudRate,
-    //   parity: this.parity,
-    //   bufferSize: 1000000,
-    // });
+    this.penDownByte = options.penDownByte;
+    this.penUpByte = options.penUpByte;
 
     this.port = new SerialPort({
-      path: "/dev/ttyUSB0",
-      parity: "odd",
-      baudRate: 19200,
+      path: this.path,
+      parity: this.parity,
+      baudRate: this.baudRate,
     });
 
-    this.keepReading = true;
+    this.process();
+
     this.port.on("data", (data) => {
-      console.log(data);
-
-      this.process(data, new Date().getTime());
+      this.bytesArray.push(...new Uint8Array(data));
     });
-
-    // read function, constantly read data (using await) until keepreading is false
-    // let read = async () => {
-    //   this.reader = await this.port.readable.getReader();
-    //   while (this.port.readable && this.keepReading) {
-    //     try {
-    //       // reader will return done if reader.cancel() used and it will break the loop
-    //       while (true) {
-    //         const { value, done } = await this.reader.read();
-    //         if (done) {
-    //           break;
-    //         }
-    //         // call process and give data and the current time
-    //         console.log(value.toString());
-    //         this.process(value, new Date().getTime());
-    //       }
-    //     } catch (error) {
-    //       console.error(error);
-    //       break;
-    //     } finally {
-    //       await this.reader.releaseLock();
-    //     }
-    //   }
-    // };
-    // this.reading = read();
 
     // reset bytes array after 0.05s, it clear any old bytes were stuck in the buffer
     setTimeout(() => {
@@ -141,52 +112,82 @@ export class SignaturePadSerialDriver extends BaseDriver {
    */
   process = (data, timeCalled) => {
     // data is recieved as bytes representing points on the pad
-    // device send limited number of points/s wich is around 120 times/s
-    // to fix having gaps between points when user draw a line constantly it check the last time user draw
-    // if it was less than 30ms ago it connect that 2 points with a line
     let drawLine = true;
-    // if (this.lastCallTime != null && this.lastCallTime + 30 > timeCalled)
-    //   drawLine = true;
-
-    this.bytesArray.push(...data);
-
-    // while the bytesArray have over 5 elements (chunk size is 5) it keep processing data in it
-    while (this.bytesArray.length >= this.chunkSize) {
+    setInterval(() => {
+      if (this.bytesArray.length < this.chunkSize) return;
       let decodedObj = null;
       decodedObj = this.decodeFunction(
         this.bytesArray.slice(0, this.chunkSize)
       );
       if ("ignore" in decodedObj && decodedObj.ignore === true) {
-        this.bytesArray.splice(0, this.chunkSize);
-        continue;
+        this.bytesArray.splice(
+          0,
+          this.bytesArray.findIndex(
+            (value) => value == this.penDownByte || value == this.penUpByte
+          )
+        );
+        return;
       }
       if ("invalid" in decodedObj && decodedObj.invalid === true) {
         this.lastX = null;
         this.lastY = null;
-        this.bytesArray.splice(0, this.chunkSize);
-        continue;
+        this.bytesArray.splice(
+          0,
+          this.bytesArray.findIndex(
+            (value) => value == this.penDownByte || value == this.penUpByte
+          )
+        );
+        return;
       }
       drawLine = true;
       if ("penOut" in decodedObj) {
         this.lastX = null;
         this.lastY = null;
-        this.bytesArray.splice(0, this.chunkSize);
+        this.bytesArray.splice(0, 1);
+        this.bytesArray.splice(
+          0,
+          this.bytesArray.findIndex(
+            (value) => value == this.penDownByte || value == this.penUpByte
+          )
+        );
         drawLine = false;
-        continue;
+        return;
       }
       let x = decodedObj.x;
       let y = decodedObj.y;
-      console.log(x, y);
       // remove the decoded bytes from the array
+      let nextPointIndex = this.bytesArray.findIndex(
+        (value) => value == this.penDownByte || value == this.penUpByte
+      );
+      if (nextPointIndex === -1) {
+        this.bytesArray.splice(0, this.bytesArray.length - 1);
+        return;
+      }
       this.bytesArray.splice(0, this.chunkSize);
+      if (
+        this.bytesArray[0] != this.penDownByte &&
+        this.bytesArray[0] != this.penDownByte
+      ) {
+        console.log(this.bytesArray);
+        this.bytesArray.splice(
+          0,
+          this.bytesArray.findIndex(
+            (value) => value == this.penDownByte || value == this.penUpByte
+          )
+        );
+        return;
+      }
       if (drawLine === true && this.lastX !== null && this.lastY !== null) {
         this.callbackFunction(x, y, this.lastX, this.lastY);
       } else this.callbackFunction(x, y, x, y);
       this.lastX = x;
       this.lastY = y;
-    }
-    if (this.lastX !== null && this.lastY !== null)
-      this.lastCallTime = timeCalled;
+
+      if (this.lastX !== null && this.lastY !== null)
+        this.lastCallTime = timeCalled;
+
+      this.locked = false;
+    }, 5);
   };
 
   /**
@@ -194,9 +195,6 @@ export class SignaturePadSerialDriver extends BaseDriver {
    */
   disconnect = async () => {
     if (this.port != null) {
-      this.keepReading = false;
-      this.reader.cancel();
-      await this.reading;
       await this.port.close();
     }
   };

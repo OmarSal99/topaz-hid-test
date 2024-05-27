@@ -63,10 +63,6 @@ export class SignaturePadController extends BaseController {
         this.currentProfile.canvasHeight
       );
     });
-
-    // await signaturePadView.loadHtml();
-
-    // this.clearCanvas();
   };
 
   /**
@@ -82,11 +78,13 @@ export class SignaturePadController extends BaseController {
     this.signaturePadDriver =
       this.currentProfile.connectionInterface ===
       connectionInterfaces.SERIALPORT
-        ? new SignaturePadSerialDriver(this.drawOnCanvas)
-        : new SignaturePadHIDDriver(this.drawOnCanvas);
-    let deviceNumber = undefined;
+        ? new SignaturePadSerialDriver()
+        : new SignaturePadHIDDriver();
     try {
-      deviceNumber = await this.signaturePadDriver.connect(this.drawOnCanvas);
+      await this.signaturePadDriver.connect({
+        vid: this.currentProfile.vid,
+        pid: this.currentProfile.pid,
+      });
     } catch (error) {
       //usually enter if user didn't select any device
       console.error(error);
@@ -94,26 +92,13 @@ export class SignaturePadController extends BaseController {
       signaturePadView.enableConnectButton();
       return;
     }
-    // search for a suitable profile using filter function
-    // let i = 0;
-    // for (; i < profiles.length; i++) {
-    //   if (profiles[i].PROFILE.filter(deviceNumber.vid, deviceNumber.pid)) break;
-    // }
-    // if (i >= profiles.length) {
-    //   alert(
-    //     "Couldn't find suitable profile for that device! device could be not supported"
-    //   );
-    //   signaturePadView.setConnectButtonInner(connectInner);
-    //   signaturePadView.enableConnectButton();
-    //   return;
-    // }
-    // let profile = profiles[i].PROFILE;
-
     try {
       this.signaturePadDriver.open({
         baudRate: this.currentProfile.baudRate,
         parity: this.currentProfile.parity,
         chunkSize: this.currentProfile.chunkSize,
+        penDownByte: this.currentProfile.penDownByte,
+        penUpByte: this.currentProfile.penUpByte,
         decodeFunction: this.currentProfile.decodeFunction,
         callbackFunction: this.drawOnCanvas,
       });
