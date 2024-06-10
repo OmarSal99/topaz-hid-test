@@ -17,6 +17,9 @@ export class TopazSignaturePadTLBK755SEBBSBProfile extends BaseProfile {
     return false;
   };
 
+  static penDownByte = 0xe5;
+  static penUpByte = 0xe4;
+  
   static baudRate = 115200;
   
   static chunkSize = 5;
@@ -28,10 +31,10 @@ export class TopazSignaturePadTLBK755SEBBSBProfile extends BaseProfile {
   static canvasHeight = this.bottomCoordinate - this.topCoordinate;
 
   static decodeFunction = (bytes) => {
-    if (bytes[0] != 0xe5 && bytes[0] != 0xe4)
+    if (bytes[0] != this.penDownByte && bytes[0] != this.penUpByte)
       return { x: null, y: null, invalid: true, ignore: true };
-    if (bytes[0] == 0xe4) return { x: null, y: null, penOut: true };
-    if (bytes[0] != 0xe5) return { x: null, y: null, invalid: true };
+    if (bytes[0] == this.penUpByte) return { x: null, y: null, penOut: true };
+    if (bytes[0] != this.penDownByte) return { x: null, y: null, invalid: true };
     let bytesObj = super.decodeFunction(bytes);
     if (bytesObj.x != null) bytesObj.x = bytesObj.x - this.leftCoordinate;
     if (bytesObj.y != null) bytesObj.y = bytesObj.y - this.topCoordinate;

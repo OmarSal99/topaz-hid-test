@@ -114,6 +114,8 @@ export class SignaturePadController extends BaseController {
         baudRate: this.currentProfile.baudRate,
         parity: this.currentProfile.parity,
         chunkSize: this.currentProfile.chunkSize,
+        penDownByte: this.currentProfile.penDownByte,
+        penUpByte: this.currentProfile.penUpByte,
         decodeFunction: this.currentProfile.decodeFunction,
         callbackFunction: this.drawOnCanvas,
       });

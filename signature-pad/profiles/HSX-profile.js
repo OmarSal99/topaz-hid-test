@@ -18,6 +18,9 @@ export class TopazSignaturePadTLBKHSXProfile extends BaseProfile {
     return vid == 0x06a8 && pid == 0x0043;
   };
 
+  static penDownByte = 0xc1;
+  static penUpByte = 0xc0;
+
   static connectionInterface = connectionInterfaces.HID;
 
   static chunkSize = 6;
@@ -30,10 +33,10 @@ export class TopazSignaturePadTLBKHSXProfile extends BaseProfile {
 
   static decodeFunction = (bytes) => {
     bytes = bytes.slice(1);
-    if (bytes[0] != 0xc1 && bytes[0] != 0xc0)
+    if (bytes[0] != this.penDownByte && bytes[0] != this.penUpByte)
       return { x: null, y: null, invalid: true, ignore: true };
-    if (bytes[0] == 0xc0) return { x: null, y: null, penOut: true };
-    if (bytes[0] != 0xc1) return { x: null, y: null, invalid: true };
+    if (bytes[0] == this.penUpByte) return { x: null, y: null, penOut: true };
+    if (bytes[0] != this.penDownByte) return { x: null, y: null, invalid: true };
     let bytesObj = super.decodeFunction(bytes);
     if (bytesObj.x != null) bytesObj.x = bytesObj.x - this.leftCoordinate;
     if (bytesObj.y != null) bytesObj.y = bytesObj.y - this.topCoordinate;

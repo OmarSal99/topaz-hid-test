@@ -63,6 +63,9 @@ export class BaseProfile {
    */
   static canvasHeight = 1000;
 
+  static penDownByte = 0xc1;
+  static penUpByte = 0xc0;
+
   /**
    * the decodeFunction, it take an array of bytes and return x and y after decoded
    * if no point/line should be drawn set invalid as true (the default is always valid unless it is set to true)

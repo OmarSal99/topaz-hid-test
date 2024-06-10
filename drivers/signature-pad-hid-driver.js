@@ -7,6 +7,8 @@ export class SignaturePadHIDDriver extends BaseDriver {
     this.callbackFunction = null;
     this.parity = null;
     this.baudRate = null;
+    this.penDownByte = null;
+    this.penUpByte = null;
 
     // number of bytes that represent each point
     this.chunkSize = null;
@@ -81,9 +83,12 @@ export class SignaturePadHIDDriver extends BaseDriver {
     this.parity = options.parity;
     this.chunkSize = options.chunkSize;
     this.decodeFunction = options.decodeFunction;
+    this.penDownByte = options.penDownByte;
+    this.penUpByte = options.penUpByte;
 
     // open a connection with that device
     await this.port.open();
+    this.process();
     this.keepReading = true;
 
     // setTimeout(() => {
@@ -98,7 +103,8 @@ export class SignaturePadHIDDriver extends BaseDriver {
       if (this.keepReading) {
         let data = new Uint8Array(event.data.buffer);
         console.log(data.toString());
-        this.process(data, new Date().getTime());
+        this.bytesArray.push(...data);
+        // this.process(data, new Date().getTime());
       }
     });
 
@@ -117,51 +123,82 @@ export class SignaturePadHIDDriver extends BaseDriver {
    */
   process = (data, timeCalled) => {
     // data is recieved as bytes representing points on the pad
-    // device send limited number of points/s wich is around 120 times/s
-    // to fix having gaps between points when user draw a line constantly it check the last time user draw
-    // if it was less than 30ms ago it connect that 2 points with a line
     let drawLine = true;
-    // if (this.lastCallTime != null && this.lastCallTime + 30 > timeCalled)
-    //   drawLine = true;
-
-    this.bytesArray.push(...data);
-    // while the bytesArray have over 6 elements (chunk size is 6) it keep processing data in it
-    while (this.bytesArray.length >= this.chunkSize) {
+    setInterval(() => {
+      if (this.bytesArray.length < this.chunkSize) return;
       let decodedObj = null;
       decodedObj = this.decodeFunction(
         this.bytesArray.slice(0, this.chunkSize)
       );
       if ("ignore" in decodedObj && decodedObj.ignore === true) {
-        this.bytesArray.splice(0, this.chunkSize);
-        continue;
+        this.bytesArray.splice(
+          0,
+          this.bytesArray.findIndex(
+            (value) => value == this.penDownByte || value == this.penUpByte
+          )
+        );
+        return;
       }
       if ("invalid" in decodedObj && decodedObj.invalid === true) {
         this.lastX = null;
         this.lastY = null;
-        this.bytesArray.splice(0, this.chunkSize);
-        continue;
+        this.bytesArray.splice(
+          0,
+          this.bytesArray.findIndex(
+            (value) => value == this.penDownByte || value == this.penUpByte
+          )
+        );
+        return;
       }
       drawLine = true;
       if ("penOut" in decodedObj) {
         this.lastX = null;
         this.lastY = null;
-        this.bytesArray.splice(0, this.chunkSize);
+        this.bytesArray.splice(0, 1);
+        this.bytesArray.splice(
+          0,
+          this.bytesArray.findIndex(
+            (value) => value == this.penDownByte || value == this.penUpByte
+          )
+        );
         drawLine = false;
-        continue;
+        return;
       }
       let x = decodedObj.x;
       let y = decodedObj.y;
-      console.log(x, y);
       // remove the decoded bytes from the array
+      let nextPointIndex = this.bytesArray.findIndex(
+        (value) => value == this.penDownByte || value == this.penUpByte
+      );
+      if (nextPointIndex === -1) {
+        this.bytesArray.splice(0, this.bytesArray.length - 1);
+        return;
+      }
       this.bytesArray.splice(0, this.chunkSize);
+      if (
+        this.bytesArray[0] != this.penDownByte &&
+        this.bytesArray[0] != this.penDownByte
+      ) {
+        console.log(this.bytesArray);
+        this.bytesArray.splice(
+          0,
+          this.bytesArray.findIndex(
+            (value) => value == this.penDownByte || value == this.penUpByte
+          )
+        );
+        return;
+      }
       if (drawLine === true && this.lastX !== null && this.lastY !== null) {
         this.callbackFunction(x, y, this.lastX, this.lastY);
       } else this.callbackFunction(x, y, x, y);
       this.lastX = x;
       this.lastY = y;
-    }
-    if (this.lastX !== null && this.lastY !== null)
-      this.lastCallTime = timeCalled;
+
+      if (this.lastX !== null && this.lastY !== null)
+        this.lastCallTime = timeCalled;
+
+      this.locked = false;
+    }, 5);
   };
 
   /**
