@@ -96,7 +96,8 @@ export class SignaturePadHIDDriver extends BaseDriver {
     //   // const decimalNumbersArray = lines.map((line) => [...line.trim().split(",")]);
     //   decimalNumbersArray = decimalNumbersArray.map((str) => +str);
     //   console.log(new Uint8Array(decimalNumbersArray));
-    //   this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
+    //   this.bytesArray.push(...new Uint8Array(decimalNumbersArray));
+    //   // this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
     // }, 2000);
 
     this.port.addEventListener("inputreport", (event) => {
@@ -127,6 +128,12 @@ export class SignaturePadHIDDriver extends BaseDriver {
     setInterval(() => {
       if (this.bytesArray.length < this.chunkSize) return;
       let decodedObj = null;
+      this.bytesArray.splice(
+        0,
+        this.bytesArray.findIndex(
+          (value) => value == this.penDownByte || value == this.penUpByte
+        )
+      );
       decodedObj = this.decodeFunction(
         this.bytesArray.slice(0, this.chunkSize)
       );

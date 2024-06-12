@@ -23,7 +23,6 @@ export class TopazSignaturePadTLBK57GCBHSXProfile extends BaseProfile {
   static connectionInterface = connectionInterfaces.HID;
 
   static chunkSize = 6;
-
   // width is the diffrence between right and left
   static canvasWidth = this.rightCoordinate - this.leftCoordinate;
 
@@ -31,11 +30,12 @@ export class TopazSignaturePadTLBK57GCBHSXProfile extends BaseProfile {
   static canvasHeight = this.bottomCoordinate - this.topCoordinate;
 
   static decodeFunction = (bytes) => {
-    bytes = bytes.slice(1);
+    // bytes = bytes.slice(1);
     if (bytes[0] != this.penDownByte && bytes[0] != this.penUpByte)
       return { x: null, y: null, invalid: true, ignore: true };
     if (bytes[0] == this.penUpByte) return { x: null, y: null, penOut: true };
-    if (bytes[0] != this.penDownByte) return { x: null, y: null, invalid: true };
+    if (bytes[0] != this.penDownByte)
+      return { x: null, y: null, invalid: true };
     let bytesObj = super.decodeFunction(bytes);
     if (bytesObj.x != null) bytesObj.x = bytesObj.x - this.leftCoordinate;
     if (bytesObj.y != null) bytesObj.y = bytesObj.y - this.topCoordinate;
