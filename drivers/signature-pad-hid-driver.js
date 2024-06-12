@@ -128,15 +128,16 @@ export class SignaturePadHIDDriver extends BaseDriver {
     setInterval(() => {
       if (this.bytesArray.length < this.chunkSize) return;
       let decodedObj = null;
-      this.bytesArray.splice(
-        0,
-        this.bytesArray.findIndex(
+      let startIndex = this.bytesArray.findIndex(
+        (value) => value == this.penDownByte || value == this.penUpByte
+      );
+      this.bytesArray.splice(0, startIndex);
+      let nextIndex = this.bytesArray
+        .slice(1)
+        .findIndex(
           (value) => value == this.penDownByte || value == this.penUpByte
-        )
-      );
-      decodedObj = this.decodeFunction(
-        this.bytesArray.slice(0, this.chunkSize)
-      );
+        );
+      decodedObj = this.decodeFunction(this.bytesArray.slice(0, nextIndex));
       if ("ignore" in decodedObj && decodedObj.ignore === true) {
         this.bytesArray.splice(
           0,
@@ -181,12 +182,17 @@ export class SignaturePadHIDDriver extends BaseDriver {
         this.bytesArray.splice(0, this.bytesArray.length - 1);
         return;
       }
-      this.bytesArray.splice(0, this.chunkSize);
+      this.bytesArray.splice(0, 1);
+      this.bytesArray.splice(
+        0,
+        this.bytesArray.findIndex(
+          (value) => value == this.penDownByte || value == this.penUpByte
+        )
+      );
       if (
         this.bytesArray[0] != this.penDownByte &&
-        this.bytesArray[0] != this.penDownByte
+        this.bytesArray[0] != this.penUpByte
       ) {
-        console.log(this.bytesArray);
         this.bytesArray.splice(
           0,
           this.bytesArray.findIndex(
