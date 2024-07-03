@@ -19,7 +19,7 @@ export class TopazSignaturePadTLBK462BSBProfile extends BaseProfile {
 
   static vid = 0x0403;
   static pid = 0x6001;
-  
+
   static penDownByte = 0xe5;
   static penUpByte = 0xe4;
 
@@ -33,7 +33,8 @@ export class TopazSignaturePadTLBK462BSBProfile extends BaseProfile {
     if (bytes[0] != this.penDownByte && bytes[0] != this.penUpByte)
       return { x: null, y: null, invalid: true, ignore: true };
     if (bytes[0] == this.penUpByte) return { x: null, y: null, penOut: true };
-    if (bytes[0] != this.penDownByte) return { x: null, y: null, invalid: true };
+    if (bytes[0] != this.penDownByte)
+      return { x: null, y: null, invalid: true };
 
     let bytesObj = super.decodeFunction(bytes);
     if (bytesObj.x != null) bytesObj.x = bytesObj.x - this.leftCoordinate;

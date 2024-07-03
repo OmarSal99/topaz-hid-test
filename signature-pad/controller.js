@@ -180,12 +180,8 @@ export class SignaturePadController extends BaseController {
    * download signature as image
    */
   downloadImage = () => {
-    signaturePadView.downloadImage(
-      this.xStart,
-      this.yStart,
-      this.xEnd,
-      this.yEnd
-    );
+    console.log(canvas.width, canvas.height);
+    signaturePadView.downloadImage(0, 0, canvas.width, canvas.height);
   };
 
   destroy = async () => {

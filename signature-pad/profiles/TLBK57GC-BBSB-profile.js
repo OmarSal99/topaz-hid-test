@@ -16,7 +16,7 @@ export class TopazSignaturePadTLBK57GCBBSBProfile extends BaseProfile {
     return false;
     // return vid == 0x0403 && pid == 0x6001;
   };
-  
+
   static vid = 0x0403;
   static pid = 0x6001;
 
@@ -33,7 +33,8 @@ export class TopazSignaturePadTLBK57GCBBSBProfile extends BaseProfile {
 
   static decodeFunction = (bytes) => {
     if (bytes[0] == this.penUpByte) return { x: null, y: null, penOut: true };
-    if (bytes[0] != this.penDownByte) return { x: null, y: null, invalid: true };
+    if (bytes[0] != this.penDownByte)
+      return { x: null, y: null, invalid: true };
 
     let bytesObj = super.decodeFunction(bytes);
     if (bytesObj.x != null) bytesObj.x = bytesObj.x - this.leftCoordinate;

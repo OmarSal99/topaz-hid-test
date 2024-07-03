@@ -1,5 +1,5 @@
 import { BaseDriver } from "./base-driver.js";
-// import { testData } from "./testData.js";
+import { testData } from "./testData.js";
 var HID = require("node-hid");
 
 export class SignaturePadHIDDriver extends BaseDriver {
@@ -30,11 +30,13 @@ export class SignaturePadHIDDriver extends BaseDriver {
     this.lastCallTime = null;
     this.lastX = null;
     this.lastY = null;
+
+    this.readInterval = null;
   }
 
-  /**
+   /**
    * request a device from the user, return it's pid and vid
-   * @returns {{vid: Number, pid: Number}}
+   * @param {{vid: Number, pid: Number}}
    */
   connect = async ({ vid, pid }) => {
     // request the user to select a device (it will give permission to interact with the device)
@@ -99,26 +101,27 @@ export class SignaturePadHIDDriver extends BaseDriver {
     this.penUpByte = options.penUpByte;
 
     // open a connection with that device
-    this.port = await HID.HIDAsync.open(this.path);
+    // this.port = await HID.HIDAsync.open(this.path);
     this.process();
 
-    this.port.on("data", (data) => {
-      // let data = new Uint8Array(event.data.buffer);
-      // console.log(data.toString());
-      // this.process(data, new Date().getTime());
-      console.log(data.toString());
-      this.bytesArray.push(...data);
-    });
+    // this.port.on("data", (data) => {
+    //   // let data = new Uint8Array(event.data.buffer);
+    //   // console.log(data.toString());
+    //   // this.process(data, new Date().getTime());
+    //   console.log(...data);
+    //   this.bytesArray.push(...data);
+    // });
     // await this.port.open();
     // this.keepReading = true;
 
-    // // setTimeout(() => {
-    // //   let decimalNumbersArray = testData.trim().split(/\n|,/);
-    // //   // const decimalNumbersArray = lines.map((line) => [...line.trim().split(",")]);
-    // //   decimalNumbersArray = decimalNumbersArray.map((str) => +str);
-    // //   console.log(new Uint8Array(decimalNumbersArray));
-    // //   this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
-    // // }, 2000);
+      setTimeout(() => {
+        let decimalNumbersArray = testData.trim().split(/\n| /);
+        // const decimalNumbersArray = lines.map((line) => [...line.trim().split(",")]);
+        decimalNumbersArray = decimalNumbersArray.map((str) => +str);
+        console.log(new Uint8Array(decimalNumbersArray));
+        // this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
+        this.bytesArray.push(...new Uint8Array(decimalNumbersArray))
+      }, 2000);
 
     // this.port.addEventListener("inputreport", (event) => {
     //   if (this.keepReading) {
@@ -129,10 +132,10 @@ export class SignaturePadHIDDriver extends BaseDriver {
     // });
 
     // // reset bytes array after 0.05s, it clear any old bytes were stuck in the buffer
-    // setTimeout(() => {
-    //   this.bytesArray = [];
-    //   this.callbackFunction = options.callbackFunction;
-    // }, 50);
+    setTimeout(() => {
+      this.bytesArray = [];
+      this.callbackFunction = options.callbackFunction;
+    }, 50);
   };
 
   /**
@@ -239,6 +242,10 @@ export class SignaturePadHIDDriver extends BaseDriver {
   disconnect = async () => {
     if (this.port != null) {
       this.keepReading = false;
+      if (this.readInterval) {
+        clearInterval(this.readInterval);
+        this.readInterval = null;
+      }
       await this.port.close();
     }
   };
