@@ -34,7 +34,7 @@ export class SignaturePadHIDDriver extends BaseDriver {
     this.readInterval = null;
   }
 
-   /**
+  /**
    * request a device from the user, return it's pid and vid
    * @param {{vid: Number, pid: Number}}
    */
@@ -114,14 +114,14 @@ export class SignaturePadHIDDriver extends BaseDriver {
     // await this.port.open();
     // this.keepReading = true;
 
-      // setTimeout(() => {
-      //   let decimalNumbersArray = testData.trim().split(/\n| /);
-      //   // const decimalNumbersArray = lines.map((line) => [...line.trim().split(",")]);
-      //   decimalNumbersArray = decimalNumbersArray.map((str) => +str);
-      //   console.log(new Uint8Array(decimalNumbersArray));
-      //   // this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
-      //   this.bytesArray.push(...new Uint8Array(decimalNumbersArray))
-      // }, 2000);
+    // setTimeout(() => {
+    //   let decimalNumbersArray = testData.trim().split(/\n| /);
+    //   // const decimalNumbersArray = lines.map((line) => [...line.trim().split(",")]);
+    //   decimalNumbersArray = decimalNumbersArray.map((str) => +str);
+    //   console.log(new Uint8Array(decimalNumbersArray));
+    //   // this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
+    //   this.bytesArray.push(...new Uint8Array(decimalNumbersArray))
+    // }, 2000);
 
     // this.port.addEventListener("inputreport", (event) => {
     //   if (this.keepReading) {
@@ -147,7 +147,7 @@ export class SignaturePadHIDDriver extends BaseDriver {
   process = (data, timeCalled) => {
     // data is recieved as bytes representing points on the pad
     let drawLine = true;
-    setInterval(() => {
+    this.readInterval = setInterval(() => {
       if (this.bytesArray.length < this.chunkSize) return;
       let decodedObj = null;
       let startIndex = this.bytesArray.findIndex(
