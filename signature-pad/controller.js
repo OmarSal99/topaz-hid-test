@@ -63,10 +63,6 @@ export class SignaturePadController extends BaseController {
         this.currentProfile.canvasHeight
       );
     });
-
-    // await signaturePadView.loadHtml();
-
-    // this.clearCanvas();
   };
 
   /**
@@ -94,20 +90,6 @@ export class SignaturePadController extends BaseController {
       signaturePadView.enableConnectButton();
       return;
     }
-    // search for a suitable profile using filter function
-    // let i = 0;
-    // for (; i < profiles.length; i++) {
-    //   if (profiles[i].PROFILE.filter(deviceNumber.vid, deviceNumber.pid)) break;
-    // }
-    // if (i >= profiles.length) {
-    //   alert(
-    //     "Couldn't find suitable profile for that device! device could be not supported"
-    //   );
-    //   signaturePadView.setConnectButtonInner(connectInner);
-    //   signaturePadView.enableConnectButton();
-    //   return;
-    // }
-    // let profile = profiles[i].PROFILE;
 
     try {
       this.signaturePadDriver.open({
