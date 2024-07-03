@@ -1,5 +1,5 @@
 import { BaseDriver } from "./base-driver.js";
-import { testData } from "./testData.js";
+// import { testData } from "./testData.js";
 var HID = require("node-hid");
 
 export class SignaturePadHIDDriver extends BaseDriver {
@@ -101,27 +101,27 @@ export class SignaturePadHIDDriver extends BaseDriver {
     this.penUpByte = options.penUpByte;
 
     // open a connection with that device
-    // this.port = await HID.HIDAsync.open(this.path);
+    this.port = await HID.HIDAsync.open(this.path);
     this.process();
 
-    // this.port.on("data", (data) => {
-    //   // let data = new Uint8Array(event.data.buffer);
-    //   // console.log(data.toString());
-    //   // this.process(data, new Date().getTime());
-    //   console.log(...data);
-    //   this.bytesArray.push(...data);
-    // });
+    this.port.on("data", (data) => {
+      // let data = new Uint8Array(event.data.buffer);
+      // console.log(data.toString());
+      // this.process(data, new Date().getTime());
+      console.log(...data);
+      this.bytesArray.push(...data);
+    });
     // await this.port.open();
     // this.keepReading = true;
 
-      setTimeout(() => {
-        let decimalNumbersArray = testData.trim().split(/\n| /);
-        // const decimalNumbersArray = lines.map((line) => [...line.trim().split(",")]);
-        decimalNumbersArray = decimalNumbersArray.map((str) => +str);
-        console.log(new Uint8Array(decimalNumbersArray));
-        // this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
-        this.bytesArray.push(...new Uint8Array(decimalNumbersArray))
-      }, 2000);
+      // setTimeout(() => {
+      //   let decimalNumbersArray = testData.trim().split(/\n| /);
+      //   // const decimalNumbersArray = lines.map((line) => [...line.trim().split(",")]);
+      //   decimalNumbersArray = decimalNumbersArray.map((str) => +str);
+      //   console.log(new Uint8Array(decimalNumbersArray));
+      //   // this.process(new Uint8Array(decimalNumbersArray), new Date().getTime());
+      //   this.bytesArray.push(...new Uint8Array(decimalNumbersArray))
+      // }, 2000);
 
     // this.port.addEventListener("inputreport", (event) => {
     //   if (this.keepReading) {
