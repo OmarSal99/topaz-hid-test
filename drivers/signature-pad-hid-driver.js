@@ -27,6 +27,8 @@ export class SignaturePadHIDDriver extends BaseDriver {
     this.lastCallTime = null;
     this.lastX = null;
     this.lastY = null;
+
+    this.readInterval = null;
   }
 
   /**
@@ -125,7 +127,7 @@ export class SignaturePadHIDDriver extends BaseDriver {
   process = (data, timeCalled) => {
     // data is recieved as bytes representing points on the pad
     let drawLine = true;
-    setInterval(() => {
+    this.readInterval = setInterval(() => {
       if (this.bytesArray.length < this.chunkSize) return;
       let decodedObj = null;
       let startIndex = this.bytesArray.findIndex(
@@ -220,6 +222,10 @@ export class SignaturePadHIDDriver extends BaseDriver {
   disconnect = async () => {
     if (this.port != null) {
       this.keepReading = false;
+      if (this.readInterval) {
+        clearInterval(this.readInterval);
+        this.readInterval = null;
+      }
       await this.port.close();
     }
   };
